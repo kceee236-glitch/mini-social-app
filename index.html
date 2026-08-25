@@ -4,128 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatify | Kceetech</title>
-    <style>
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            max-width: 550px;
-            margin: 40px auto;
-            padding: 20px;
-            background: #0f1419;
-            color: #fff;
-        }
-
-        @font-face {
-            font-family: 'poppins';
-            src: url('assets/fonts/Poppins-Regular.ttf');
-        }
-
-        h2 {
-            color: #1d9bf0;
-            font-size: 28px;
-            font-weight: 800;
-            border-bottom: 1px solid #2f3336;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-            font-family: poppins;
-        }
-
-        .compose-box {
-            background: #15181c;
-            border: 1px solid #2f3336;
-            padding: 20px;
-            border-radius: 16px;
-            margin-bottom: 25px;
-        }
-
-        input,
-        textarea {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 12px;
-            background: #000;
-            border: 1px solid #2f3336;
-            color: #fff;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 15px;
-            font-family: poppins;
-        }
-
-        input:focus,
-        textarea:focus {
-            border-color: #1d9bf0;
-            outline: none;
-        }
-
-        button {
-            background: #1d9bf0;
-            color: #fff;
-            border: none;
-            padding: 12px;
-            font-weight: bold;
-            width: 100%;
-            border-radius: 9999px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.2s;
-            font-family: poppins;
-        }
-
-        button:hover {
-            background: #1a8cd8;
-        }
-
-        .feed-header {
-            font-size: 20px;
-            font-weight: 700;
-            color: #e7e9ea;
-            margin-top: 30px;
-            margin-bottom: 15px;
-        }
-
-        .post-card {
-            background: #15181c;
-            padding: 18px;
-            margin-top: 12px;
-            border: 1px solid #2f3336;
-            border-radius: 16px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .post-meta {
-            display: flex;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-
-        .post-author {
-            color: #1d9bf0;
-            font-weight: 700;
-            margin-right: 8px;
-            font-family: poppins;
-        }
-
-        .post-time {
-            color: #71767b;
-            font-size: 13px;
-            font-family: poppins;
-        }
-
-        .post-body {
-            color: #e7e9ea;
-            font-size: 15px;
-            line-height: 1.4;
-            word-break: break-word;
-            font-family: poppins;
-        }
-    </style>
+    <meta name="description"
+        content="Kcee Chatify is a live micro social chat platform by Kceetech. Join the conversation and post real-time updates instantly.">
+    <meta name="google-site-verification" content="LGYFGRqI9BUI4nkQ4-aSp-BN14e7yTOkM7y1X7KGGZ8" />
+    <title>Kcee Chatify</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <h2>Kcee Chatify</h2>
+    <h1>Kcee Chatify</h1>
 
     <div class="compose-box">
         <input type="text" id="usernameInput" placeholder="Your Handle (e.g. @kcee_tech)">
@@ -135,74 +23,7 @@
 
     <div class="feed-header">Chats</div>
     <div id="postsDisplayGrid"></div>
-
-    <script>
-        // While developing locally, keep this pointed at your computer. 
-        // We will change this URL string to our Render link in the next step!
-        //  const SERVER_API = 'https://mini-social-app-8e0f.onrender.com';
-        const SERVER_API = 'https://mini-social-app-8e0f.onrender.com/api/posts';
-
-        // 1. FETCH LIVE CHANNELS FROM DATABASE ENGINE
-        async function fetchMessages() {
-            try {
-                const response = await fetch(SERVER_API);
-                const postsArray = await response.json();
-
-                const displayGrid = document.getElementById('postsDisplayGrid');
-
-                if (postsArray.length === 0) {
-                    displayGrid.innerHTML = `<p style="color:#71767b; text-align:center; margin-top:20px; font-family: poppins;">The room is completely empty. Be the first to chat!</p>`;
-                    return;
-                }
-
-                displayGrid.innerHTML = postsArray.map(post => `
-          <div class="post-card">
-            <div class="post-meta">
-              <span class="post-author">${escapeText(post.username)}</span>
-              <span class="post-time">• live</span>
-            </div>
-            <div class="post-body">${escapeText(post.post_text)}</div>
-          </div>
-        `).join('');
-            } catch (err) {
-                console.error("Could not sync with public timeline API:", err);
-            }
-        }
-
-        // 2. TRANSMIT STRINGS TO SECURE SQL PARAMETERS
-        async function sendPostToBackend() {
-            const nameField = document.getElementById('usernameInput');
-            const textField = document.getElementById('messageInput');
-
-            if (!nameField.value.trim() || !textField.value.trim()) {
-                alert("Fields cannot be submitted empty.");
-                return;
-            }
-
-            try {
-                await fetch(SERVER_API, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: nameField.value.trim(), text: textField.value.trim() })
-                });
-
-                // Clear layout components and force real-time sync refresh
-                nameField.value = '';
-                textField.value = '';
-                fetchMessages();
-            } catch (err) {
-                alert("Network fault: Delivery pipeline dropped data packets.");
-            }
-        }
-
-        // Security sanitization layer to block malicious script injections
-        function escapeText(str) {
-            return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
-        }
-
-        // Initial lifecycle pull request hook
-        fetchMessages();
-    </script>
+    <script src="script.js"></script>
 </body>
 
 </html>

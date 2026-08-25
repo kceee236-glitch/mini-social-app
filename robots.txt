@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kceechatify.netlify.app/sitemap.xml

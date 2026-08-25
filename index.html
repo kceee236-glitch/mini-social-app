@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connect.Kceetech</title>
+    <title>Chatify | Kceetech</title>
     <style>
         body {
             font-family: system-ui, -apple-system, sans-serif;
@@ -15,6 +15,11 @@
             color: #fff;
         }
 
+        @font-face {
+            font-family: poppins;
+            src: url(/assets/font/Poppins-Regular.ttf);
+        }
+
         h2 {
             color: #1d9bf0;
             font-size: 28px;
@@ -22,6 +27,7 @@
             border-bottom: 1px solid #2f3336;
             padding-bottom: 15px;
             margin-bottom: 20px;
+            font-family: poppins;
         }
 
         .compose-box {
@@ -43,6 +49,7 @@
             border-radius: 8px;
             box-sizing: border-box;
             font-size: 15px;
+            font-family: poppins;
         }
 
         input:focus,
@@ -62,6 +69,7 @@
             cursor: pointer;
             font-size: 16px;
             transition: background 0.2s;
+            font-family: poppins;
         }
 
         button:hover {
@@ -96,11 +104,13 @@
             color: #1d9bf0;
             font-weight: 700;
             margin-right: 8px;
+            font-family: poppins;
         }
 
         .post-time {
             color: #71767b;
             font-size: 13px;
+            font-family: poppins;
         }
 
         .post-body {
@@ -108,21 +118,22 @@
             font-size: 15px;
             line-height: 1.4;
             word-break: break-word;
+            font-family: poppins;
         }
     </style>
 </head>
 
 <body>
 
-    <h2>Pulse Network</h2>
+    <h2>Kcee Chatify</h2>
 
     <div class="compose-box">
-        <input type="text" id="usernameInput" placeholder="Your Handle (e.g. @dev_builder)">
-        <textarea id="messageInput" rows="3" placeholder="What's happening? Broadcast to the global feed..."></textarea>
-        <button onclick="sendPostToBackend()">Post to Feed</button>
+        <input type="text" id="usernameInput" placeholder="Your Handle (e.g. @kcee_tech)">
+        <textarea id="messageInput" rows="3" placeholder="What's happening? type a chat..."></textarea>
+        <button onclick="sendPostToBackend()">Post Message</button>
     </div>
 
-    <div class="feed-header">Global Timeline</div>
+    <div class="feed-header">Chats</div>
     <div id="postsDisplayGrid"></div>
 
     <script>
@@ -140,7 +151,7 @@
                 const displayGrid = document.getElementById('postsDisplayGrid');
 
                 if (postsArray.length === 0) {
-                    displayGrid.innerHTML = `<p style="color:#71767b; text-align:center; margin-top:20px;">The feed is completely empty. Be the first to post!</p>`;
+                    displayGrid.innerHTML = `<p style="color:#71767b; text-align:center; margin-top:20px; font-family: poppins;">The room is completely empty. Be the first to chat!</p>`;
                     return;
                 }
 

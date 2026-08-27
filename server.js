@@ -1,46 +1,62 @@
 const express = require("express");
 const cors = require("cors");
-const db = require("./database"); // Pulls in our newly created database module
+const rateLimit = require("express-rate-limit");
+const db = require("./database");
 
 const app = express();
-app.use(cors());
-app.use(express.json());
 
-// CHANNEL 1: FETCH GLOBAL FEED LOGS (Sorted newest first)
+// 1. Lock down CORS strictly to your Netlify domain
+app.use(
+  cors({
+    origin: "https://kceechatify.netlify.app",
+  }),
+);
+
+// 2. Prevent payload flooding (limit JSON payload size to 10KB)
+app.use(express.json({ limit: "10kb" }));
+
+// 3. Protect API routes against spam (max 50 requests per 15 minutes per IP)
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 50,
+  message: { error: "Too many requests from this IP. Please wait a bit." },
+});
+app.use("/api/", apiLimiter);
+
+// GET timeline
 app.get("/api/posts", (req, res) => {
-  const sql = "SELECT * FROM micro_posts ORDER BY id DESC";
-
+  const sql = "SELECT * FROM micro_posts ORDER BY id DESC LIMIT 100";
   db.all(sql, [], (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+    if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
   });
 });
 
-// CHANNEL 2: INJECT NEW SOCIAL PUBLIC POSTS
+// POST new message with server-side length validation
 app.post("/api/posts", (req, res) => {
   const { name, text } = req.body;
 
   if (!name || !text) {
     return res
       .status(400)
-      .json({ error: "Username and text parameters are required." });
+      .json({ error: "Username and message text are required." });
+  }
+
+  // Enforce max character lengths
+  if (name.trim().length > 30 || text.trim().length > 280) {
+    return res
+      .status(400)
+      .json({ error: "Username or post text exceeds maximum allowed length." });
   }
 
   const sql = "INSERT INTO micro_posts (username, post_text) VALUES (?, ?)";
   db.run(sql, [name.trim(), text.trim()], function (err) {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+    if (err) return res.status(500).json({ error: err.message });
     res
       .status(201)
       .json({ message: "Post broadcast successfully!", postId: this.lastID });
   });
 });
 
-// Set the port dynamically for cloud environments (Render requires process.env.PORT)
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`SUCCESS! Mini Social Platform running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running safely on port ${PORT}`));

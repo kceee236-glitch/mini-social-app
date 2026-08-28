@@ -15,7 +15,22 @@ app.use(
 // 2. Prevent payload flooding (limit JSON payload size to 10KB)
 app.use(express.json({ limit: "10kb" }));
 
-// 3. Protect API routes against spam (max 50 requests per 15 minutes per IP)
+// 3. Return a completely blank page when visiting the main domain URL (/)
+app.get("/", (req, res) => {
+  res.status(200).send("");
+});
+
+// 4. Send a blank page if opened directly in a web browser (HTML request)
+app.use((req, res, next) => {
+  const acceptsHtml =
+    req.headers.accept && req.headers.accept.includes("text/html");
+  if (acceptsHtml) {
+    return res.status(200).send("");
+  }
+  next();
+});
+
+// 5. Protect API routes against spam (max 50 requests per 15 minutes per IP)
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 50,
@@ -56,6 +71,11 @@ app.post("/api/posts", (req, res) => {
       .status(201)
       .json({ message: "Post broadcast successfully!", postId: this.lastID });
   });
+});
+
+// 6. Catch-all: Send a blank page for any non-existent routes (replaces Express 404 HTML)
+app.use((req, res) => {
+  res.status(404).send("");
 });
 
 const PORT = process.env.PORT || 5000;
